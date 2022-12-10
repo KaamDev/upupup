@@ -423,7 +423,7 @@ def uploadee(url: str) -> str:
         raise DirectDownloadLinkException(f"ERROR: Failed to acquire download URL from upload.ee for : {url}")
         
         
- def gdtot(url: str) -> str:
+ def gdtot(url):
     """ Gdtot google drive link generator
     By https://github.com/xcscxr """
     
