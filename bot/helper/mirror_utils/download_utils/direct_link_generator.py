@@ -421,6 +421,27 @@ def uploadee(url: str) -> str:
         return sa['href']
     except:
         raise DirectDownloadLinkException(f"ERROR: Failed to acquire download URL from upload.ee for : {url}")
+        
+        
+ def gdtot(url: str) -> str:
+    """ Gdtot google drive link generator
+    By https://github.com/xcscxr """
+    
+    parsed_url = urlparse(url)
+    client = rsession()
+    try:
+        client.cookies.set(name='crypt', value="UllSWmE0YjZ3UVNRc0NMZ3JqS3c2R0JOUS9FWGVreG1GZkVhUkRrNElWVT0%3D", domain=parsed_url.netloc)
+        res = client.get(url)
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e}")
+    try:
+        res = client.get(f"{parsed_url.scheme}://{parsed_url.netloc}/dld?id={url.split('/')[-1]}")
+        matches = re_findall('gd=(.*?)&', res.text)
+        decoded_id = b64decode(str(matches[0])).decode('utf-8')
+        return f'https://drive.google.com/open?id={decoded_id}'
+    except:
+        raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
+        
 
 def terabox(url) -> str:
     if not path.isfile('terabox.txt'):
@@ -442,22 +463,3 @@ def terabox(url) -> str:
     if result['isdir'] != '0':
         raise DirectDownloadLinkException("ERROR: Can't download folder")
     return result['dlink']
-  
-  def gdtot(url: str) -> str:
-    """ Gdtot google drive link generator
-    By https://github.com/xcscxr """
-    
-    parsed_url = urlparse(url)
-    client = rsession()
-    try:
-        client.cookies.set(name='crypt', value="UllSWmE0YjZ3UVNRc0NMZ3JqS3c2R0JOUS9FWGVreG1GZkVhUkRrNElWVT0%3D", domain=parsed_url.netloc)
-        res = client.get(url)
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e}")
-    try:
-        res = client.get(f"{parsed_url.scheme}://{parsed_url.netloc}/dld?id={url.split('/')[-1]}")
-        matches = re_findall('gd=(.*?)&', res.text)
-        decoded_id = b64decode(str(matches[0])).decode('utf-8')
-        return f'https://drive.google.com/open?id={decoded_id}'
-    except:
-        raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
